@@ -1,6 +1,4 @@
-import 'package:flutter_clean_architecture/domain/entities/account_entity.dart';
-import 'package:meta/meta.dart';
-
+import '../../domain/helpers/helpers.dart';
 import '../../domain/usecases/usecases.dart';
 import '../../data/http/http.dart';
 
@@ -10,17 +8,22 @@ class RemoteAuthentication {
 
   RemoteAuthentication({required this.httpClient, required this.url});
 
-  Future<void>? auth(AuthenticationParams params) async {
+  Future<void> auth(AuthenticationParams params) async {
     final body = RemoteAuthenticationParams.fromDomain(params).toJson();
-    await httpClient.request(url: url, method: 'post', body: body);
+
+    try {
+      await httpClient.request(url: url, method: 'post', body: body);
+    } on HttpError {
+      throw DomainError.unexpected;
+    }
   }
 }
 
 class RemoteAuthenticationParams {
-  final String? email;
-  final String? password;
+  final String email;
+  final String password;
 
-  RemoteAuthenticationParams({@required this.email, @required this.password});
+  RemoteAuthenticationParams({required this.email, required this.password});
 
   factory RemoteAuthenticationParams.fromDomain(AuthenticationParams params) =>
       RemoteAuthenticationParams(
