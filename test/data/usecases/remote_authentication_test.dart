@@ -44,4 +44,16 @@ void main() {
 
     expect(future, throwsA(DomainError.unexpected));
   });
+
+  test('Should throw UnexpectedError if HttpClient returns 404 ', () async {
+    when(httpClient.request(
+            url: url,
+            method: 'post',
+            body: {'email': params.email, 'password': params.password}))
+        .thenThrow(HttpError.notFound);
+
+    final future = sut.auth(params);
+
+    expect(future, throwsA(DomainError.unexpected));
+  });
 }
