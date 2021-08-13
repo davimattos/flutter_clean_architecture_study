@@ -22,7 +22,7 @@ void main() {
   PostExpectation mockRequest() => when(httpClient.request(
       url: url,
       method: 'post',
-      body: {'email': params.email, 'password': params.password}));
+      body: {'email': params.email, 'password': params.secret}));
 
   void mockHttpData(Map data) {
     mockRequest().thenAnswer((_) async => data);
@@ -37,7 +37,7 @@ void main() {
     url = faker.internet.httpUrl();
     sut = RemoteAuthentication(httpClient: httpClient, url: url);
     params = AuthenticationParams(
-        email: faker.internet.email(), password: faker.internet.password());
+        email: faker.internet.email(), secret: faker.internet.password());
     mockHttpData(mockValidData());
   });
 
@@ -47,7 +47,7 @@ void main() {
     verify(httpClient.request(
         url: url,
         method: 'post',
-        body: {'email': params.email, 'password': params.password}));
+        body: {'email': params.email, 'password': params.secret}));
   });
 
   test('Should throw UnexpectedError if HttpClient returns 400 ', () async {

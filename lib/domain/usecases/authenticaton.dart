@@ -1,4 +1,4 @@
-import 'package:flutter_clean_architecture/domain/entities/account_entity.dart';
+import '../../domain/entities/entities.dart';
 
 abstract class Authentication {
   Future<AccountEntity> auth(AuthenticationParams params);
@@ -6,7 +6,7 @@ abstract class Authentication {
 
 class AuthenticationParams {
   final String email;
-  final String password;
+  final String secret;
 
-  AuthenticationParams({required this.email, required this.password});
+  AuthenticationParams({required this.email, required this.secret});
 }

@@ -1,4 +1,5 @@
-import '../../domain/helpers/helpers.dart';
+import 'package:flutter_clean_architecture/data/http/http_error.dart';
+
 import '../../domain/entities/entities.dart';
 
 class RemoteAccountModel {
@@ -8,7 +9,7 @@ class RemoteAccountModel {
 
   factory RemoteAccountModel.fromJson(Map json) {
     if (!json.containsKey('accessToken')) {
-      throw DomainError.unexpected;
+      throw HttpError.invalidData;
     }
     return RemoteAccountModel(json['accessToken']);
   }
