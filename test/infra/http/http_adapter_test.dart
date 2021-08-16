@@ -65,7 +65,7 @@ void main() {
     });
 
     test('Should return null if post returns 204', () async {
-      mockResponse(200, body: '');
+      mockResponse(204, body: '');
 
       final response = await sut.request(url: url, method: 'post');
 
@@ -73,7 +73,7 @@ void main() {
     });
 
     test('Should return null if post returns 204 with data', () async {
-      mockResponse(200);
+      mockResponse(204);
 
       final response = await sut.request(url: url, method: 'post');
 
@@ -81,7 +81,7 @@ void main() {
     });
 
     test('Should return BadRequest if post returns 400', () async {
-      mockResponse(200, body: '');
+      mockResponse(400, body: '');
 
       final future = sut.request(url: url, method: 'post');
 
@@ -89,11 +89,19 @@ void main() {
     });
 
     test('Should return BadRequest if post returns 400', () async {
-      mockResponse(200);
+      mockResponse(400);
 
       final future = sut.request(url: url, method: 'post');
 
       expect(future, throwsA(HttpError.badRequest));
+    });
+
+    test('Should return ServerError if post returns 500', () async {
+      mockResponse(500);
+
+      final future = sut.request(url: url, method: 'post');
+
+      expect(future, throwsA(HttpError.serverError));
     });
   });
 }
