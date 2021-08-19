@@ -1,27 +1,31 @@
+import 'dart:convert';
+
 import 'package:faker/faker.dart';
 import 'package:http/http.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 import 'package:flutter_clean_architecture/data/http/http.dart';
 import 'package:flutter_clean_architecture/infra/http/http.dart';
 
-class ClientSpy extends Mock implements Client {}
+import 'http_adapter_test.mocks.dart';
 
+@GenerateMocks([Client])
 void main() {
   late HttpAdapter sut;
-  late ClientSpy client;
+  late MockClient client;
   late String url;
 
   setUp(() {
-    client = ClientSpy();
+    client = MockClient();
     sut = HttpAdapter(client);
     url = faker.internet.httpUrl();
   });
 
   group('shared', () {
     test('Should throw ServerError if invalid method is provided', () async {
-      final future = await sut.request(url: url, method: 'invalid_method');
+      final future = sut.request(url: url, method: 'invalid_method');
 
       expect(future, throwsA(HttpError.serverError));
     });
@@ -33,7 +37,7 @@ void main() {
 
     void mockResponse(int statusCode,
         {String body = '{"any_key": "any_value"}'}) {
-      mockRequest().thenAnswer((_) async => Response(body, 200));
+      mockRequest().thenAnswer((_) async => Response(body, statusCode));
     }
 
     void mockError() {
@@ -45,19 +49,19 @@ void main() {
     });
 
     test('Should call post with correct values', () async {
-      await sut
-          .request(url: url, method: 'post', body: {'any_key': 'any_value'});
+      final body = {'any_key': 'any_value'};
+      await sut.request(url: url, method: 'post', body: body);
 
-      verify(client.post(Uri.parse(url), headers: {
-        'content-type': 'application/json',
-        'accept': 'application/json',
-      }, body: {
-        "any_key": "any_value"
-      }));
+      verify(client.post(Uri.parse(url),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+          body: jsonEncode(body)));
     });
 
     test('Should call post without body', () async {
-      await sut.request(url: url, method: 'post', body: anyNamed('body'));
+      await sut.request(url: url, method: 'post');
 
       verify(client.post(Uri.parse(url), headers: anyNamed('headers')));
     });
